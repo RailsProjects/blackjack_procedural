@@ -4,8 +4,6 @@
 
 require 'pry'
 
-dealer_total = 0
-player_total = 0
 play_again = 'y'
 hit = 'y'
 bust = 'n'
@@ -16,7 +14,7 @@ full_deck =
   'CA', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'D10', 'CJ', 'CQ', 'CK',
   'SA', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'SJ', 'SQ', 'SK' ]
 
-def calculate_hand (hand) 
+def calculate_hand (hand, total) 
   total = 0
   hand2 = hand.dup # duplicate array so this method doesn't mutate/empty the original
 
@@ -25,8 +23,10 @@ def calculate_hand (hand)
 
     case card[1]
     when 'A'
-      if total + 11 > 21
+binding.pry
+      if (total + 11) > 21
         total += 1
+binding.pry
       else
         total += 11
       end
@@ -45,10 +45,10 @@ def calculate_hand (hand)
   total
 end
 
-def display_hands(dealer_cards, player_cards)
+def display_hands(dealer_cards, player_cards, player_total)
     puts "Dealer's Up Card is: " + dealer_cards[0].to_s
     puts "Your Cards are:    " + player_cards.to_s  
-    puts "Your Total is: " + calculate_hand(player_cards).to_s
+    puts "Your Total is: " + calculate_hand(player_cards, player_total).to_s
 end
 
 print "Enter Your Name: "
@@ -63,13 +63,12 @@ while play_again == 'y'
   deck = full_deck.shuffle
   dealer_cards = [deck.pop, deck.pop]
   player_cards = [deck.pop, deck.pop]
+  dealer_total = 0
+  player_total = 0
 
-  # define method display_hands here to avoid runtime error:
-  # `display_hands': undefined local variable or method `dealer_cards'
-  
   # Ask if player wants a hit, check for bust
   while hit == 'y' && bust == 'n'
-    display_hands(dealer_cards, player_cards)
+    display_hands(dealer_cards, player_cards, player_total)
     print "Do you want a hit? (y/n) "
     hit = gets.chomp
     puts
@@ -78,6 +77,8 @@ while play_again == 'y'
       player_cards << deck.pop
     end
 
+    player_total =  calculate_hand(player_cards, player_total) 
+
     if player_total > 21
       bust = 'y'
     end
@@ -85,12 +86,13 @@ while play_again == 'y'
 
   # If you bust then end game, else continue
   if bust == 'y'
+    display_hands(dealer_cards, player_cards, player_total)
     puts "You Bust."
   else
     # Dealer gets cards until s/he hits hard 17
     while dealer_total < 17 # less than hard 17
       dealer_cards << deck.pop
-      dealer_total =  calculate_hand(dealer_cards) 
+      dealer_total =  calculate_hand(dealer_cards, dealer_total) 
     end
 
     # List Dealer cards and total
