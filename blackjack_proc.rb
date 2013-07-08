@@ -23,10 +23,10 @@ def calculate_hand (hand, total)
 
     case card[1]
     when 'A'
-binding.pry
+#binding.pry
       if (total + 11) > 21
         total += 1
-binding.pry
+#binding.pry
       else
         total += 11
       end
