@@ -14,22 +14,21 @@ full_deck =
   'CA', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'D10', 'CJ', 'CQ', 'CK',
   'SA', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'SJ', 'SQ', 'SK' ]
 
-def calculate_hand (hand, total) 
+def calculate_hand (hand) 
   total = 0
   hand2 = hand.dup # duplicate array so this method doesn't mutate/empty the original
-
+  hand3 = hand.dup
+  
   while hand2.size != 0  # or do hand.each
     card = hand2.pop
 
     case card[1]
-    when 'A'
-#binding.pry
-      if (total + 11) > 21
-        total += 1
-#binding.pry
-      else
-        total += 11
-      end
+    when 'A' 
+      total += 11
+
+    #when '1' | 'J' | 'Q' | 'K'
+    #total += 10
+
     when '1'
       total += 10
     when 'J'
@@ -42,13 +41,12 @@ def calculate_hand (hand, total)
       total += card[1].to_i
     end
   end
-  total
-end
 
-def display_hands(dealer_cards, player_cards, player_total)
-    puts "Dealer's Up Card is: " + dealer_cards[0].to_s
-    puts "Your Cards are:    " + player_cards.to_s  
-    puts "Your Total is: " + calculate_hand(player_cards, player_total).to_s
+  # ID how many Aces I have.  For each Ace, subtract 10 if total > 21
+  hand3.select{|e| e== "A" }.count.times do
+    total -= 10 if total > 21
+  end
+  total
 end
 
 print "Enter Your Name: "
@@ -68,7 +66,10 @@ while play_again == 'y'
 
   # Ask if player wants a hit, check for bust
   while hit == 'y' && bust == 'n'
-    display_hands(dealer_cards, player_cards, player_total)
+    puts "Dealer's Up Card is: " + dealer_cards[0].to_s
+    player_total = calculate_hand(player_cards)
+    puts "Your Cards are: " + player_cards.to_s  + ", Your Total is: #{player_total}"
+    
     print "Do you want a hit? (y/n) "
     hit = gets.chomp
     puts
@@ -77,8 +78,7 @@ while play_again == 'y'
       player_cards << deck.pop
     end
 
-    player_total =  calculate_hand(player_cards, player_total) 
-
+    player_total =  calculate_hand(player_cards) 
     if player_total > 21
       bust = 'y'
     end
@@ -86,22 +86,27 @@ while play_again == 'y'
 
   # If you bust then end game, else continue
   if bust == 'y'
-    display_hands(dealer_cards, player_cards, player_total)
+    player_total = calculate_hand(player_cards)
+    puts "Your Cards are: " + player_cards.to_s  + ", Your Total is: #{player_total}"
     puts "You Bust."
+  elsif calculate_hand(player_cards == 21)
+    puts "Blackjack - YOU WIN!!"
   else
     # Dealer gets cards until s/he hits hard 17
-    while dealer_total < 17 # less than hard 17
-      dealer_cards << deck.pop
-      dealer_total =  calculate_hand(dealer_cards, dealer_total) 
-    end
+      while dealer_total < 17 # less than hard 17
+        dealer_cards << deck.pop
+        dealer_total =  calculate_hand(dealer_cards) 
+      end
 
     # List Dealer cards and total
-    puts "Dealer Cards are: " + dealer_cards.to_s
-    puts "Dealer Total is: " + dealer_total.to_s
-
+    dealer_total =  calculate_hand(dealer_cards)     
+    puts "Dealer Cards are: " + dealer_cards.to_s + ", Dealer Total is: #{dealer_total}" 
+    
     # Calculate outcome of game
     if dealer_total > 21 
       puts "Dealer busts.  YOU WIN!"
+    elsif dealer_total == 21
+      puts "Dealer has blackjack - You lose."
     elsif dealer_total < player_total 
       puts "YOU WIN!"  
     elsif dealer_total == player_total
