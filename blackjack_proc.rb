@@ -25,17 +25,7 @@ def calculate_hand (hand)
     case card[1]
     when 'A' 
       total += 11
-
-    #when '1' | 'J' | 'Q' | 'K'
-    #total += 10
-
-    when '1'
-      total += 10
-    when 'J'
-      total += 10
-    when 'Q'
-      total += 10
-    when 'K'
+    when '1', 'J', 'Q', 'K'
       total += 10
     else
       total += card[1].to_i
@@ -89,7 +79,7 @@ while play_again == 'y'
     player_total = calculate_hand(player_cards)
     puts "Your Cards are: " + player_cards.to_s  + ", Your Total is: #{player_total}"
     puts "You Bust."
-  elsif calculate_hand(player_cards == 21)
+  elsif calculate_hand(player_cards) == 21
     puts "Blackjack - YOU WIN!!"
   else
     # Dealer gets cards until s/he hits hard 17
@@ -101,7 +91,7 @@ while play_again == 'y'
     # List Dealer cards and total
     dealer_total =  calculate_hand(dealer_cards)     
     puts "Dealer Cards are: " + dealer_cards.to_s + ", Dealer Total is: #{dealer_total}" 
-    
+
     # Calculate outcome of game
     if dealer_total > 21 
       puts "Dealer busts.  YOU WIN!"
